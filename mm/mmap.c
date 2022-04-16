@@ -1561,6 +1561,14 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 			 */
 			pgoff = addr >> PAGE_SHIFT;
 			break;
+		case MAP_SFORK:
+						/*
+			 * Set pgoff according to addr for anon_vma.
+			 */
+			pgoff = addr >> PAGE_SHIFT;
+			vm_flags |= VM_SFORK;
+			printk(KERN_INFO "MAP_SFORK case implemented in mmap.c");
+			break;
 		default:
 			return -EINVAL;
 		}
@@ -1578,6 +1586,11 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 		/* hugetlb applies strict overcommit unless MAP_NORESERVE */
 		if (file && is_file_hugepages(file))
 			vm_flags |= VM_NORESERVE;
+	}
+
+	if(flags & MAP_SFORK) {
+		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+		vm_flags |= VM_SFORK;
 	}
 
 	addr = mmap_region(file, addr, len, vm_flags, pgoff, uf);
